@@ -1,0 +1,17 @@
+{
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "description": "",
+  "manifest_version": 2,
+  "name": "Copy Image As Base64 Data URL",
+  "permissions": [
+    "<all_urls>",
+    "menus",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "version": "1.0"
+}
