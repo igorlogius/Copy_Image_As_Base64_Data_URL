@@ -4,7 +4,10 @@
       "background.js"
     ]
   },
-  "description": "",
+  "description": "allows to copy any image as a base64 data url",
+  "icons": {
+    "250": "icon.png"
+  },
   "manifest_version": 2,
   "name": "Copy Image As Base64 Data URL",
   "permissions": [
@@ -13,5 +16,5 @@
     "clipboardWrite",
     "notifications"
   ],
-  "version": "1.0"
+  "version": "1.1"
 }
