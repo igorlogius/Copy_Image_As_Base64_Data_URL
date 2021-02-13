@@ -22,7 +22,7 @@ function onError(e, msg){
 
 browser.menus.create({   // menus permission 
 	id: extId,
-	title: "Copy as base64",
+	title: extId,
 	documentUrlPatterns: [ "<all_urls>" ],
 	contexts: ["image" ]
 });
