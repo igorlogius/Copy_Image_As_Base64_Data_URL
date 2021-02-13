@@ -27,8 +27,9 @@ browser.menus.create({   // menus permission
 	contexts: ["image" ]
 });
 
+
 browser.menus.onClicked.addListener( async (clickData,tab) => {
-	if(clickData.menuItemId !== "img2b64"){
+	if(clickData.menuItemId !== extId){
 		return;
 	}
 	try {
