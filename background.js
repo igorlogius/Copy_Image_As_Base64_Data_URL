@@ -1,5 +1,9 @@
 const extId = 'Copy Image As Base64 Data URL'
 
+function onError(e, msg){
+	console.log(`${extId}::onError error: ${e}, message: ${msg}`);
+}
+
 async function showNotification(title,message){
 	const options = {
 		"type": "basic",
@@ -8,7 +12,8 @@ async function showNotification(title,message){
 		"message": message
 	};
 	try {
-		const nid = await browser.notifications.create(extId, options);
+		const nid = await browser.notifications.create(extId, options); // notifications permission 
+
 		return nid;
 	}catch(err){
 		onError(err, 'failed notificationId.create');
@@ -16,39 +21,59 @@ async function showNotification(title,message){
 	return null;
 }
 
-function onError(e, msg){
-	console.log(`${extId}::onError error: ${e}, message: ${msg}`);
+function pFileReader(file) {
+	return new Promise( (resolve,reject) => {
+		const fr = new FileReader();
+		fr.onload = () => { resolve(fr.result); }
+		fr.onerror = reject;
+		fr.readAsDataURL(file);
+	});
+}
+
+
+async function onClicked(clickData,tab) {
+	if(clickData.menuItemId !== extId){
+		return;
+	}
+
+	let title = " - Failure";
+	let msg = "The image data was successfully copied into the clipboard buffer";
+
+	try {
+		let data = await fetch(clickData.srcUrl, { // <all_urls> permissions 
+			method: "GET", 
+			mode: "cors", 
+			credentials: "include", 
+			cache: "default", 
+			redirect: "follow" 
+		}); 
+		data = await data.blob();
+
+		try {
+			data = await pFileReader(data);
+			console.log(data);
+
+			try {
+				navigator.clipboard.writeText(data);
+				title = " - Success";
+			}catch(e) {
+				msg = 'The image data could not be copied into the clipboard buffer';
+			}
+		}catch(e){
+			msg = 'The image data could not be read into memory';
+		}
+	}catch(e){
+		msg = 'The image data could not be retrieved from cache or network';
+	}
+	showNotification(title, msg);
 }
 
 browser.menus.create({   // menus permission 
 	id: extId,
 	title: extId,
-	documentUrlPatterns: [ "<all_urls>" ],
-	contexts: ["image" ]
+	documentUrlPatterns: ["<all_urls>"],
+	contexts: ["image"]
 });
 
-
-browser.menus.onClicked.addListener( async (clickData,tab) => {
-	if(clickData.menuItemId !== extId){
-		return;
-	}
-	try {
-		const reader = new FileReader();
-		const response = await fetch(clickData.srcUrl); // <all_urls> permissions 
-
-		const body = await response.blob()
-		reader.onload = function() {
-			console.log(reader.result);
-			navigator.clipboard.writeText(reader.result);
-			showNotification('Successfully copied Image Data', 'The image data was successfully copied into the clipboard buffer');
-		}
-		reader.onerror = function() {
-			// read failed 
-			showNotification('failed to read image data', 'The image data could not be processed via the FileReader API');
-		}
-		reader.readAsDataURL(body);
-	}catch(e){
-		showNotification('failed to fetch image data', 'The image date could not be retrieved via the Fetch API');
-	}
-});
+browser.menus.onClicked.addListener(onClicked); // menus permission 
 
