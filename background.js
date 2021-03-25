@@ -1,4 +1,4 @@
-const extId = 'Copy Image As Base64 Data URL'
+const extId = 'img2b64'
 
 function onError(e, msg){
 	console.log(`${extId}::onError error: ${e}, message: ${msg}`);
